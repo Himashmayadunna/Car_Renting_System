@@ -1,71 +1,64 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../core/theme/colors.dart';
-import '../buyer/buyer_home_screen.dart';
-import '../seller/seller_dashboard_screen.dart';
+import '../../providers/auth_provider.dart';
+import '../buyer/buyer_main_screen.dart';
+import '../seller/seller_main_screen.dart';
 
-class RoleSelectionScreen extends StatelessWidget {
+import 'splash_screen.dart';
+
+class RoleSelectionScreen extends StatefulWidget {
   const RoleSelectionScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              "Choose Your Role",
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 40),
-            buildRoleCard(
-              context,
-              title: "Rent a Vehicle",
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const BuyerHomeScreen(),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 20),
-            buildRoleCard(
-              context,
-              title: "List Your Vehicle",
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const SellerDashboardScreen(),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
+  State<RoleSelectionScreen> createState() => _RoleSelectionScreenState();
+}
+
+class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
+  bool _initialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      _initialized = true;
+      _checkAuth();
+    }
   }
 
-  Widget buildRoleCard(BuildContext context,
-      {required String title, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 120,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: AppColors.cardDark,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Center(
-          child: Text(
-            title,
-            style: const TextStyle(fontSize: 20),
-          ),
+  Future<void> _checkAuth() async {
+    final authProvider = context.read<AuthProvider>();
+    await authProvider.init();
+
+    if (!mounted) return;
+
+    if (authProvider.isLoggedIn) {
+      final screen = authProvider.isSeller
+          ? const SellerMainScreen()
+          : const BuyerMainScreen();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => screen),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const SplashScreen()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.directions_car, size: 48, color: AppColors.primary),
+            SizedBox(height: 16),
+            CircularProgressIndicator(color: AppColors.primary),
+          ],
         ),
       ),
     );
