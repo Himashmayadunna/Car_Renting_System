@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "275569710088",
+    "project_id": "carrenting-77d97",
+    "storage_bucket": "carrenting-77d97.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:275569710088:android:08621b5ac3db40adeaadbd",
+        "android_client_info": {
+          "package_name": "com.example.car_renting_system"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDz6IQNK0GmZsrlpJVDpDvQUaJtREhfTM0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
