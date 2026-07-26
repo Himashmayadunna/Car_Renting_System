@@ -15,7 +15,10 @@ class BookingModel {
   final double totalPrice;
   final String status; // 'pending', 'confirmed', 'active', 'completed', 'cancelled'
   final String? pickupLocation;
+  final String? dropoffLocation;
   final String? notes;
+  final double? rating;
+  final String? review;
   final DateTime createdAt;
 
   BookingModel({
@@ -35,7 +38,10 @@ class BookingModel {
     required this.totalPrice,
     this.status = 'pending',
     this.pickupLocation,
+    this.dropoffLocation,
     this.notes,
+    this.rating,
+    this.review,
     required this.createdAt,
   });
 
@@ -57,7 +63,10 @@ class BookingModel {
       'totalPrice': totalPrice,
       'status': status,
       'pickupLocation': pickupLocation,
+      'dropoffLocation': dropoffLocation,
       'notes': notes,
+      'rating': rating,
+      'review': review,
       'createdAt': createdAt.toIso8601String(),
     };
   }
@@ -80,12 +89,20 @@ class BookingModel {
       totalPrice: (map['totalPrice'] ?? 0.0).toDouble(),
       status: map['status'] ?? 'pending',
       pickupLocation: map['pickupLocation'],
+      dropoffLocation: map['dropoffLocation'],
       notes: map['notes'],
+      rating: map['rating'] != null ? (map['rating'] as num).toDouble() : null,
+      review: map['review'],
       createdAt: DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()),
     );
   }
 
-  BookingModel copyWith({String? status}) {
+  BookingModel copyWith({
+    String? status,
+    double? rating,
+    String? review,
+    String? dropoffLocation,
+  }) {
     return BookingModel(
       id: id,
       vehicleId: vehicleId,
@@ -103,7 +120,10 @@ class BookingModel {
       totalPrice: totalPrice,
       status: status ?? this.status,
       pickupLocation: pickupLocation,
+      dropoffLocation: dropoffLocation ?? this.dropoffLocation,
       notes: notes,
+      rating: rating ?? this.rating,
+      review: review ?? this.review,
       createdAt: createdAt,
     );
   }
@@ -115,7 +135,7 @@ class BookingModel {
       case 'confirmed':
         return 'Confirmed';
       case 'active':
-        return 'Active';
+        return 'Active Ride';
       case 'completed':
         return 'Completed';
       case 'cancelled':

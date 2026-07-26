@@ -326,48 +326,55 @@ class VehicleDetailScreen extends StatelessWidget {
 
   Widget _buildBottomBar(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
       decoration: const BoxDecoration(
         color: AppColors.backgroundDark,
         border: Border(top: BorderSide(color: AppColors.surfaceGrey, width: 0.5)),
       ),
-      child: Row(
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text("Total price",
-                  style: TextStyle(color: AppColors.textGrey, fontSize: 12)),
-              Text(
-                "\$${vehicle.pricePerDay.toStringAsFixed(0)}/day",
-                style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary),
-              ),
-            ],
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                final auth = context.read<AuthProvider>();
-                if (auth.isGuest) {
-                  _showGuestDialog(context);
-                } else {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => BookingScreen(vehicle: vehicle),
-                    ),
-                  );
-                }
-              },
-              child: const Text("Book Now"),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("Total price",
+                    style: TextStyle(color: AppColors.textGrey, fontSize: 12)),
+                Text(
+                  "\$${vehicle.pricePerDay.toStringAsFixed(0)}/day",
+                  style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary),
+                ),
+              ],
             ),
-          ),
-        ],
+            const SizedBox(width: 20),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  final auth = context.read<AuthProvider>();
+                  if (auth.isGuest) {
+                    _showGuestDialog(context);
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => BookingScreen(vehicle: vehicle),
+                      ),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: const Text("Book Now"),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

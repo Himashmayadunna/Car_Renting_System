@@ -389,21 +389,26 @@ class _BookingScreenState extends State<BookingScreen> {
             border: Border(
                 top: BorderSide(color: AppColors.surfaceGrey, width: 0.5)),
           ),
-          child: ElevatedButton(
-            onPressed: _selectedDates == null || bookingProvider.isLoading
-                ? null
-                : _confirmBooking,
-            child: bookingProvider.isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(
-                    _selectedDates == null
-                        ? "Select Dates to Continue"
-                        : "Confirm Booking - \$${totalPrice.toStringAsFixed(0)}",
-                  ),
+          child: SafeArea(
+            top: false,
+            child: ElevatedButton(
+              onPressed: _selectedDates == null || bookingProvider.isLoading
+                  ? null
+                  : _confirmBooking,
+              child: bookingProvider.isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(
+                      _selectedDates == null
+                          ? "Select Dates to Continue"
+                          : "Confirm Booking — \$${totalPrice.toStringAsFixed(0)}",
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+            ),
           ),
         );
       },

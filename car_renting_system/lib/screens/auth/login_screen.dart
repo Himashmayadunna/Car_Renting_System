@@ -179,9 +179,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
         return SizedBox(
           width: double.infinity,
-          height: 52,
           child: ElevatedButton(
             onPressed: auth.isLoading ? null : _login,
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 52),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
             child: auth.isLoading
                 ? const SizedBox(
                     height: 20,
@@ -201,7 +204,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildGuestButton() {
     return SizedBox(
       width: double.infinity,
-      height: 52,
       child: OutlinedButton.icon(
         onPressed: () async {
           final authProvider = context.read<AuthProvider>();
@@ -216,6 +218,10 @@ class _LoginScreenState extends State<LoginScreen> {
         },
         icon: const Icon(Icons.person_outline, size: 20),
         label: const Text("Continue as Guest"),
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(double.infinity, 52),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+        ),
       ),
     );
   }

@@ -84,27 +84,34 @@ class SplashScreen extends StatelessWidget {
                   // Go button with chevron indicators
                   Row(
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const LoginScreen()),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 14),
-                          decoration: BoxDecoration(
-                            color: AppColors.cardLight,
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: const Text(
-                            "Go",
-                            style: TextStyle(
-                              color: AppColors.textDark,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                      Material(
+                        color: AppColors.cardLight,
+                        borderRadius: BorderRadius.circular(30),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const LoginScreen()),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(30),
+                          child: Container(
+                            constraints: const BoxConstraints(
+                              minWidth: 100,
+                              minHeight: 52,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 36, vertical: 14),
+                            child: const Center(
+                              child: Text(
+                                "Go",
+                                style: TextStyle(
+                                  color: AppColors.textDark,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
                           ),
                         ),

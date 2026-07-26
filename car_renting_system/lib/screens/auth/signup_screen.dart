@@ -263,9 +263,12 @@ class _SignupScreenState extends State<SignupScreen> {
 
         return SizedBox(
           width: double.infinity,
-          height: 52,
           child: ElevatedButton(
             onPressed: auth.isLoading ? null : _signup,
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 52),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
             child: auth.isLoading
                 ? const SizedBox(
                     height: 20,
