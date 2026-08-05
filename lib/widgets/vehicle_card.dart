@@ -16,14 +16,43 @@ class VehicleCard extends StatefulWidget {
   State<VehicleCard> createState() => _VehicleCardState();
 }
 
-class _VehicleCardState extends State<VehicleCard> {
-  bool _isFavorite = false;
+class _VehicleCardState extends State<VehicleCard>
+    with SingleTickerProviderStateMixin {
+  bool _isFavorite = true;
+  late AnimationController _heartController;
+  late Animation<double> _heartScale;
+
+  @override
+  void initState() {
+    super.initState();
+    _heartController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
+    _heartScale = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.35), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: 1.35, end: 1.0), weight: 50),
+    ]).animate(CurvedAnimation(parent: _heartController, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _heartController.dispose();
+    super.dispose();
+  }
+
+  void _toggleFavorite() {
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
+    _heartController.forward(from: 0.0);
+  }
 
   @override
   Widget build(BuildContext context) {
     final vehicle = widget.vehicle;
     final rating = vehicle.rating > 0 ? vehicle.rating : 4.9;
-    final locationText = vehicle.location.isNotEmpty ? vehicle.location : '1.2 km';
+    final locationText = vehicle.location.isNotEmpty ? vehicle.location : 'Colombo, LK';
 
     return RepaintBoundary(
       child: GestureDetector(
@@ -40,47 +69,51 @@ class _VehicleCardState extends State<VehicleCard> {
             color: AppColors.cardDark,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.05),
+              color: Colors.white.withOpacity(0.06),
               width: 1,
             ),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x55000000),
-                blurRadius: 10,
-                offset: Offset(0, 4),
-              ),
-            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Image Section with Badges
+              // Image Section
               Expanded(
-                flex: 5,
+                flex: 12,
                 child: ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      vehicle.images.isNotEmpty
-                          ? CachedNetworkImage(
-                              imageUrl: vehicle.images.first,
-                              fit: BoxFit.cover,
-                              memCacheWidth: 400,
-                              placeholder: (context, url) => Container(
-                                color: AppColors.surfaceGrey,
-                                child: const Center(
-                                  child: SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: AppColors.primary,
+                      Hero(
+                        tag: 'vehicle_img_${vehicle.id}',
+                        child: vehicle.images.isNotEmpty
+                            ? CachedNetworkImage(
+                                imageUrl: vehicle.images.first,
+                                fit: BoxFit.cover,
+                                memCacheWidth: 500,
+                                placeholder: (context, url) => Container(
+                                  color: AppColors.surfaceGrey,
+                                  child: const Center(
+                                    child: SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColors.primary,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              errorWidget: (context, url, error) => Container(
+                                errorWidget: (context, url, error) => Container(
+                                  color: AppColors.surfaceGrey,
+                                  child: const Icon(
+                                    Icons.directions_car,
+                                    size: 48,
+                                    color: AppColors.textGrey,
+                                  ),
+                                ),
+                              )
+                            : Container(
                                 color: AppColors.surfaceGrey,
                                 child: const Icon(
                                   Icons.directions_car,
@@ -88,55 +121,30 @@ class _VehicleCardState extends State<VehicleCard> {
                                   color: AppColors.textGrey,
                                 ),
                               ),
-                            )
-                          : Container(
-                              color: AppColors.surfaceGrey,
-                              child: const Icon(
-                                Icons.directions_car,
-                                size: 48,
-                                color: AppColors.textGrey,
-                              ),
-                            ),
-                      // Dark Gradient overlay at bottom of image for readability
-                      Positioned.fill(
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.transparent,
-                                Color(0x1A000000),
-                                Color(0x99000000),
-                              ],
-                              stops: [0.4, 0.7, 1.0],
-                            ),
-                          ),
-                        ),
                       ),
-                      // Top Left Rating Badge (★ 4.9)
+                      // Top Left: Instant Badge
                       Positioned(
-                        top: 10,
-                        left: 10,
+                        top: 12,
+                        left: 12,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.65),
-                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.black.withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.star_rounded,
+                            children: const [
+                              Icon(
+                                Icons.bolt_rounded,
                                 color: AppColors.primary,
                                 size: 14,
                               ),
-                              const SizedBox(width: 4),
+                              SizedBox(width: 4),
                               Text(
-                                rating.toStringAsFixed(1),
-                                style: const TextStyle(
-                                  fontSize: 11,
+                                'Instant',
+                                style: TextStyle(
+                                  fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.textWhite,
                                 ),
@@ -145,52 +153,28 @@ class _VehicleCardState extends State<VehicleCard> {
                           ),
                         ),
                       ),
-                      // Top Right Heart Button
+                      // Top Right: Favorite Heart
                       Positioned(
-                        top: 10,
-                        right: 10,
+                        top: 12,
+                        right: 12,
                         child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _isFavorite = !_isFavorite;
-                            });
-                          },
-                          child: Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.6),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              _isFavorite ? Icons.favorite : Icons.favorite_border,
-                              color: _isFavorite ? Colors.redAccent : AppColors.textWhite,
-                              size: 18,
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Bottom Left Distance/Location Badge
-                      Positioned(
-                        bottom: 8,
-                        left: 10,
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on,
-                              color: AppColors.textGrey,
-                              size: 12,
-                            ),
-                            const SizedBox(width: 2),
-                            Text(
-                              locationText,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: AppColors.textGreyLight,
-                                fontWeight: FontWeight.w500,
+                          onTap: _toggleFavorite,
+                          child: ScaleTransition(
+                            scale: _heartScale,
+                            child: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.65),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                _isFavorite ? Icons.favorite : Icons.favorite_border,
+                                color: _isFavorite ? AppColors.primary : AppColors.textWhite,
+                                size: 16,
                               ),
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ],
@@ -199,90 +183,93 @@ class _VehicleCardState extends State<VehicleCard> {
               ),
               // Info Section
               Expanded(
-                flex: 4,
+                flex: 10,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      // Title & Rating
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Brand name in uppercase
-                          Text(
-                            vehicle.brand.isNotEmpty
-                                ? vehicle.brand.toUpperCase()
-                                : 'CAR RENTAL',
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textGrey,
-                              letterSpacing: 0.8,
+                          Expanded(
+                            child: Hero(
+                              tag: 'vehicle_name_${vehicle.id}',
+                              child: Material(
+                                color: Colors.transparent,
+                                child: Text(
+                                  vehicle.name.isNotEmpty ? vehicle.name : "${vehicle.brand} ${vehicle.model}",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: AppColors.textWhite,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 2),
-                          // Model name in bold
-                          Text(
-                            vehicle.model.isNotEmpty
-                                ? vehicle.model
-                                : vehicle.name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: AppColors.textWhite,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          Row(
+                            children: [
+                              const Icon(Icons.star_rounded, color: AppColors.primary, size: 16),
+                              const SizedBox(width: 4),
+                              Text(
+                                rating.toStringAsFixed(1),
+                                style: const TextStyle(
+                                  color: AppColors.textWhite,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      // Specs line + Price per day row
+                      const SizedBox(height: 2),
+                      // Subtitle
+                      Text(
+                        "${vehicle.year} · ${vehicle.transmission} · ${vehicle.seats} seats",
+                        style: const TextStyle(
+                          color: AppColors.textGrey,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      // Location
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          // Specs icons (Transmission / Type)
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.speed_outlined,
-                                size: 13,
-                                color: AppColors.textGrey,
-                              ),
-                              const SizedBox(width: 3),
-                              Text(
-                                vehicle.transmission,
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: AppColors.textGrey,
-                                ),
-                              ),
-                            ],
+                          const Icon(Icons.location_on_outlined, color: AppColors.textGrey, size: 14),
+                          const SizedBox(width: 4),
+                          Text(
+                            "$locationText - 1.2 km",
+                            style: const TextStyle(
+                              color: AppColors.textGrey,
+                              fontSize: 12,
+                            ),
                           ),
-                          // Price tag
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                '\$${vehicle.pricePerDay.toStringAsFixed(0)}',
-                                style: const TextStyle(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  height: 1.1,
-                                ),
-                              ),
-                              const Text(
-                                'per day',
-                                style: TextStyle(
-                                  color: AppColors.textGrey,
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ],
+                        ],
+                      ),
+                      const Spacer(),
+                      // Price
+                      Row(
+                        children: [
+                          Text(
+                            'LKR ${vehicle.pricePerDay.toStringAsFixed(0)}',
+                            style: const TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 15,
+                            ),
+                          ),
+                          const Text(
+                            ' / day',
+                            style: TextStyle(
+                              color: AppColors.textGrey,
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),

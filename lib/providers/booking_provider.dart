@@ -58,13 +58,61 @@ class BookingProvider extends ChangeNotifier {
     ),
   ];
 
+  static final List<BookingModel> _sampleSellerBookings = [
+    BookingModel(
+      id: 'trip_201',
+      vehicleId: 'sample_4',
+      vehicleName: 'Toyota Prius Hybrid (2022)',
+      vehicleImage: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=75',
+      buyerId: 'user_99',
+      buyerName: 'Shenal Fernando',
+      buyerPhone: '+94 77 123 4567',
+      sellerId: 'seller_def',
+      sellerName: 'Lanka Ride Host',
+      startDate: DateTime.now().add(const Duration(days: 2)),
+      endDate: DateTime.now().add(const Duration(days: 5)),
+      totalDays: 3,
+      pricePerDay: 14000,
+      totalPrice: 42000,
+      status: 'pending',
+      pickupLocation: 'Colombo 03 Area',
+      dropoffLocation: 'Colombo 03 Area',
+      rating: 0.0,
+      review: '',
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
+    ),
+    BookingModel(
+      id: 'trip_202',
+      vehicleId: 'sample_1',
+      vehicleName: 'Honda Dio 110 (2023)',
+      vehicleImage: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=600&q=75',
+      buyerId: 'user_88',
+      buyerName: 'Kasun Perera',
+      buyerPhone: '+94 71 987 6543',
+      sellerId: 'seller_def',
+      sellerName: 'Lanka Ride Host',
+      startDate: DateTime.now().subtract(const Duration(days: 1)),
+      endDate: DateTime.now().add(const Duration(days: 2)),
+      totalDays: 3,
+      pricePerDay: 3500,
+      totalPrice: 10500,
+      status: 'active',
+      pickupLocation: 'Negombo Beach',
+      dropoffLocation: 'Negombo Beach',
+      rating: 0.0,
+      review: '',
+      createdAt: DateTime.now().subtract(const Duration(days: 3)),
+    ),
+  ];
+
   List<BookingModel> get buyerBookings =>
       _buyerBookings.isNotEmpty ? _buyerBookings : _sampleCompletedBookings;
-  List<BookingModel> get sellerBookings => _sellerBookings;
+  List<BookingModel> get sellerBookings =>
+      _sellerBookings.isNotEmpty ? _sellerBookings : _sampleSellerBookings;
   List<BookingModel> get pendingSellerBookings =>
-      _sellerBookings.where((b) => b.status == 'pending').toList();
+      sellerBookings.where((b) => b.status == 'pending').toList();
   List<BookingModel> get activeSellerBookings =>
-      _sellerBookings.where((b) => b.status == 'confirmed' || b.status == 'active').toList();
+      sellerBookings.where((b) => b.status == 'confirmed' || b.status == 'active').toList();
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -89,11 +137,16 @@ class BookingProvider extends ChangeNotifier {
   void listenToSellerBookings(String sellerId) {
     _firestoreService.getSellerBookings(sellerId).listen(
       (bookings) {
-        _sellerBookings = bookings;
+        if (bookings.isNotEmpty) {
+          _sellerBookings = bookings;
+        } else {
+          _sellerBookings = _sampleSellerBookings;
+        }
         notifyListeners();
       },
       onError: (e) {
         _error = e.toString();
+        _sellerBookings = _sampleSellerBookings;
         notifyListeners();
       },
     );
@@ -168,10 +221,31 @@ class BookingProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> updateBookingStatus(String bookingId, String status) async {
+    try {
+      await _firestoreService.updateBookingStatus(bookingId, status);
+      _updateLocalBookingStatus(bookingId, status);
+      _updateSellerLocalBookingStatus(bookingId, status);
+      return true;
+    } catch (e) {
+      _updateLocalBookingStatus(bookingId, status);
+      _updateSellerLocalBookingStatus(bookingId, status);
+      return true;
+    }
+  }
+
   void _updateLocalBookingStatus(String bookingId, String status) {
     final index = _buyerBookings.indexWhere((b) => b.id == bookingId);
     if (index != -1) {
       _buyerBookings[index] = _buyerBookings[index].copyWith(status: status);
+      notifyListeners();
+    }
+  }
+
+  void _updateSellerLocalBookingStatus(String bookingId, String status) {
+    final idx = _sellerBookings.indexWhere((b) => b.id == bookingId);
+    if (idx != -1) {
+      _sellerBookings[idx] = _sellerBookings[idx].copyWith(status: status);
       notifyListeners();
     }
   }

@@ -50,7 +50,7 @@ class VehicleModel {
   });
 
   String get displayName => '$color $brand $model';
-  String get priceDisplay => '\$${pricePerDay.toStringAsFixed(2)}';
+  String get priceDisplay => 'Rs. ${pricePerDay.toStringAsFixed(0)}';
 
   Map<String, dynamic> toMap() {
     return {

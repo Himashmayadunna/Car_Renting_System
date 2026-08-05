@@ -61,7 +61,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
     final timeFormat = DateFormat('hh:mm a');
 
     final subtotal = booking.pricePerDay * booking.totalDays;
-    final serviceFee = 35.0;
+    final serviceFee = 500.0;
     final grandTotal = booking.totalPrice > 0 ? booking.totalPrice : subtotal + serviceFee;
 
     return Scaffold(
@@ -367,11 +367,11 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
               child: Column(
                 children: [
                   _receiptRow(
-                    "Car Rental (${booking.totalDays} days × \$${booking.pricePerDay.toStringAsFixed(0)})",
-                    "\$${subtotal.toStringAsFixed(2)}",
+                    "Vehicle Rental (${booking.totalDays} days × Rs. ${booking.pricePerDay.toStringAsFixed(0)})",
+                    "Rs. ${subtotal.toStringAsFixed(0)}",
                   ),
                   const SizedBox(height: 10),
-                  _receiptRow("Service & Insurance Protection", "\$${serviceFee.toStringAsFixed(2)}"),
+                  _receiptRow("Service & Insurance Protection", "Rs. ${serviceFee.toStringAsFixed(0)}"),
                   const SizedBox(height: 14),
                   const Divider(color: AppColors.surfaceGrey, height: 1),
                   const SizedBox(height: 14),
@@ -387,7 +387,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                         ),
                       ),
                       Text(
-                        "\$${grandTotal.toStringAsFixed(2)}",
+                        "Rs. ${grandTotal.toStringAsFixed(0)}",
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

@@ -9,7 +9,14 @@ class AuthProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
 
-  UserModel? get user => _user;
+  UserModel? get user => _user ?? UserModel(
+    uid: 'guest_123',
+    name: 'Guest User',
+    email: 'guest@carrent.app',
+    phone: '',
+    role: 'buyer',
+    createdAt: DateTime.now(),
+  );
   bool get isLoading => _isLoading;
   String? get error => _error;
   bool get isLoggedIn => _user != null;
